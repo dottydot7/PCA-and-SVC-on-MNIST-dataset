@@ -23,17 +23,17 @@ import idx2numpy
 path = "\\"
 
 #MNIST
-test_images = idx2numpy.convert_from_file(path + "t10k-images-idx3-ubyte")
-test_images_label = idx2numpy.convert_from_file(path + "t10k-labels-idx1-ubyte")
-train_images = idx2numpy.convert_from_file(path + "train-images-idx3-ubyte")
-train_images_label = idx2numpy.convert_from_file(path + "train-labels-idx1-ubyte")
-plt.imshow(train_images[0])
-plt.show()
+test_images = (idx2numpy.convert_from_file(path + "t10k-images-idx3-ubyte")).reshape(-1)
+test_images_label = (idx2numpy.convert_from_file(path + "t10k-labels-idx1-ubyte")).reshape(-1)
+train_images = (idx2numpy.convert_from_file(path + "train-images-idx3-ubyte")).reshape(-1)
+train_images_label = (idx2numpy.convert_from_file(path + "train-labels-idx1-ubyte")).reshape(-1)
+# plt.imshow(train_images[0]) #expects 2d data, won't work with reshape
+# plt.show()
 
 #Fashion MNIST
-fashion_test_images = idx2numpy.convert_from_file(path + "fashion_t10k-images-idx3-ubyte")
-fashion_test_images_label = idx2numpy.convert_from_file(path +"fashion_t10k-labels-idx1-ubyte")
-fashion_train_images = idx2numpy.convert_from_file(path + "fashion_train-images-idx3-ubyte")
-fashion_train_images_label = idx2numpy.convert_from_file(path + "fahion_train-labels-idx1-ubyte")
-plt.imshow(fashion_train_images[0])
-plt.show()
+fashion_test_images = (idx2numpy.convert_from_file(path + "fashion_t10k-images-idx3-ubyte")).reshape(-1)
+fashion_test_images_label = (idx2numpy.convert_from_file(path +"fashion_t10k-labels-idx1-ubyte")).reshape(-1)
+fashion_train_images = (idx2numpy.convert_from_file(path + "fashion_train-images-idx3-ubyte")).reshape(-1)
+fashion_train_images_label = (idx2numpy.convert_from_file(path + "fahion_train-labels-idx1-ubyte")).reshape(-1)
+# plt.imshow(fashion_train_images[0])#expects 2d data, won't work with reshape
+# plt.show()
