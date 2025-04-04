@@ -29,6 +29,9 @@ train_images = (idx2numpy.convert_from_file(path + "train-images-idx3-ubyte")).r
 train_images_label = (idx2numpy.convert_from_file(path + "train-labels-idx1-ubyte")).reshape(-1)
 # plt.imshow(train_images[0]) #expects 2d data, won't work with reshape
 # plt.show()
+scalar = StandardScaler()
+test_images_standardized = scalar.fit_transform(test_images.reshape(-1,1)).reshape(-1)
+train_images_standardized = scalar.fit_transform(train_images.reshape(-1,1)).reshape(-1)
 
 #Fashion MNIST
 fashion_test_images = (idx2numpy.convert_from_file(path + "fashion_t10k-images-idx3-ubyte")).reshape(-1)
@@ -37,3 +40,5 @@ fashion_train_images = (idx2numpy.convert_from_file(path + "fashion_train-images
 fashion_train_images_label = (idx2numpy.convert_from_file(path + "fahion_train-labels-idx1-ubyte")).reshape(-1)
 # plt.imshow(fashion_train_images[0])#expects 2d data, won't work with reshape
 # plt.show()
+fashion_test_images_standardized = scalar.fit_transform(fashion_test_images.reshape(-1,1)).reshape(-1)
+fashion_train_images_standardized = scalar.fit_transform(fashion_train_images.reshape(-1,1)).reshape(-1)
