@@ -114,4 +114,64 @@ for n_components in [50, 100, 200]:
     apply_pca(mnist_train_images_standardized, mnist_test_images_standardized, n_components, dataset_name="MNIST")
     apply_pca(fashion_train_images_standardized, fashion_test_images_standardized, n_components, dataset_name="Fashion MNIST")
 
+#_____________________________________________________________________________________________________________________ 
+# TASK 3.3 
+#______________________________________________________________________________________________________________________ 
 
+param_grid_linear = { 
+'C': [0.01, 0.1, 1, 10] 
+} 
+
+param_grid_rbf = { 
+'C': [0.01, 0.1, 1, 10], 
+'gamma': [0.0001, 0.001, 0.01, 0.1] 
+} 
+
+param_grid_poly = { 
+'C': [0.01, 0.1, 1, 10], 
+'gamma': [0.0001, 0.001, 0.01, 0.1], 
+'degree': [2, 3, 4, 5] 
+} 
+
+
+def train_svc_with_grid_search(X_train, y_train, X_test, y_test, kernel_type, param_grid): 
+
+    print(f"\nRunning Grid Search for kernel = '{kernel_type}'") 
+
+    svc = SVC(kernel=kernel_type) 
+    grid_search = GridSearchCV(svc, param_grid, cv=3, n_jobs=-1, verbose=1, scoring='accuracy') 
+    start_time = time.time() 
+    grid_search.fit(X_train, y_train) 
+    elapsed_time = time.time() - start_time 
+
+    print(f"Best parameters for '{kernel_type}': {grid_search.best_params_}") 
+    print(f"Training time: {elapsed_time:.2f} seconds") 
+
+    best_model = grid_search.best_estimator_ 
+    y_pred = best_model.predict(X_test)
+
+    print(f"Classification Report ({kernel_type}):") 
+    print(classification_report(y_test, y_pred)) 
+
+    return best_model 
+
+pca_100 = PCA(n_components=100) 
+mnist_pca_100_train = pca_100.fit_transform(mnist_train_images_standardized) 
+mnist_pca_100_test = pca_100.transform(mnist_test_images_standardized) 
+
+#MNIST compressed data 
+X_train = mnist_pca_100_train 
+X_test = mnist_pca_100_test 
+y_train = mnist_train_images_label 
+y_test = mnist_test_images_label 
+
+# Linear kernel 
+svc_linear = train_svc_with_grid_search(X_train, y_train, X_test, y_test, 'linear', param_grid_linear) 
+
+# RBF kernel 
+svc_rbf = train_svc_with_grid_search(X_train, y_train, X_test, y_test, 'rbf', param_grid_rbf) 
+
+# Polynomial kernel 
+svc_poly = train_svc_with_grid_search(X_train, y_train, X_test, y_test, 'poly', param_grid_poly) 
+
+ 
