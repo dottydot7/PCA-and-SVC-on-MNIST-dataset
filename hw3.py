@@ -73,10 +73,10 @@ fashion_train_images_standardized = scalar.fit_transform(fashion_train_images_fl
 fashion_test_images_standardized = scalar.transform(fashion_test_images_flat)
 
 #PCA is sensitive to feature scales. Standardized data should be (mean=0, variance=1) but it's not. Ref: BOOK
-print("MNIST Train Mean:", np.mean(mnist_train_images_standardized)) 
-print("MNIST Train Std:", np.std(mnist_train_images_standardized))    
-print("Fashion MNIST Train Mean:", np.mean(fashion_train_images_standardized))  
-print("Fashion MNIST Train Std:", np.std(fashion_train_images_standardized))    
+# print("MNIST Train Mean:", np.mean(mnist_train_images_standardized)) 
+# print("MNIST Train Std:", np.std(mnist_train_images_standardized))    
+# print("Fashion MNIST Train Mean:", np.mean(fashion_train_images_standardized))  
+# print("Fashion MNIST Train Std:", np.std(fashion_train_images_standardized))    
 
 #Dimensionality Reduction Functions
 def plot_pca_variance(pca, dataset_name, n_components):
@@ -104,15 +104,47 @@ def apply_pca(X_train, X_test, n_components, dataset_name="Dataset"):
     X_train_pca = pca.fit_transform(X_train)
     X_test_pca = pca.transform(X_test)
     var_ratio = sum(pca.explained_variance_ratio_)
-    print(f"{dataset_name} PCA (n_components={n_components}) Variance Explained: {var_ratio:.4f}")
+    print(f"\n{dataset_name} PCA (n_components={n_components}) Variance Explained: {var_ratio:.4f}")
     
     plot_pca_variance(pca, dataset_name, n_components)
-    
     return X_train_pca, X_test_pca, var_ratio
 
+def classify_and_predict(X_train, y_train, X_test, y_test, dataset_name, n_components):
+    #classifier = LogisticRegression(max_iter=3000)
+    classifier = RandomForestClassifier(n_estimators=100, random_state=42)
+    classifier.fit(X_train, y_train)
+    y_pred = classifier.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"{dataset_name} Accuracy with {n_components} PCA components: {accuracy:.4f}")
+    return accuracy
+
+# for n_components in [50, 100, 200]:
+#     apply_pca(mnist_train_images_standardized, mnist_test_images_standardized, n_components, dataset_name="MNIST")
+#     apply_pca(fashion_train_images_standardized, fashion_test_images_standardized, n_components, dataset_name="Fashion MNIST")
+
 for n_components in [50, 100, 200]:
-    apply_pca(mnist_train_images_standardized, mnist_test_images_standardized, n_components, dataset_name="MNIST")
-    apply_pca(fashion_train_images_standardized, fashion_test_images_standardized, n_components, dataset_name="Fashion MNIST")
+    # MNIST
+    X_train_mnist_pca, X_test_mnist_pca, _ = apply_pca(
+        mnist_train_images_standardized, 
+        mnist_test_images_standardized, 
+        n_components, 
+        dataset_name="MNIST"
+    )
+    classify_and_predict(X_train_mnist_pca, mnist_train_images_label,
+                                  X_test_mnist_pca, mnist_test_images_label,
+                                  dataset_name="MNIST", n_components=n_components)
+    
+    # Fashion MNIST
+    X_train_fashion_pca, X_test_fashion_pca, _ = apply_pca(
+        fashion_train_images_standardized, 
+        fashion_test_images_standardized, 
+        n_components, 
+        dataset_name="Fashion MNIST"
+    )
+    classify_and_predict(X_train_fashion_pca, fashion_train_images_label,
+                                  X_test_fashion_pca, fashion_test_images_label,
+                                  dataset_name="Fashion MNIST", n_components=n_components)
+
 
 #_____________________________________________________________________________________________________________________ 
 # TASK 3.3 
