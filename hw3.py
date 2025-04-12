@@ -35,10 +35,9 @@ mnist_train_images_label = idx2numpy.convert_from_file("train-labels-idx1-ubyte"
 
 #Fashion MNIST
 fashion_test_images = idx2numpy.convert_from_file("fashion_t10k-images-idx3-ubyte")
-fashion_test_images_label = idx2numpy.convert_from_file("fashion_t10k-labels-idx1-ubyte")
+fashion_test_images_label = idx2numpy.convert_from_file("\fashion_t10k-labels-idx1-ubyte")
 fashion_train_images = idx2numpy.convert_from_file("fashion_train-images-idx3-ubyte")
-fashion_train_images_label = idx2numpy.convert_from_file("fahion_train-labels-idx1-ubyte")
-
+fashion_train_images_label = idx2numpy.convert_from_file("fashion_train-labels-idx1-ubyte")
 
 # def plot_images(images, labels, title, n=10):
 #     plt.figure(figsize=(15, 3))
@@ -110,42 +109,9 @@ def apply_pca(X_train, X_test, n_components, dataset_name="Dataset"):
     plot_pca_variance(pca, dataset_name, n_components)
     return X_train_pca, X_test_pca, var_ratio
 
-def classify_and_predict(X_train, y_train, X_test, y_test, dataset_name, n_components):
-    #classifier = LogisticRegression(max_iter=3000)
-    classifier = RandomForestClassifier(n_estimators=100, random_state=42)
-    classifier.fit(X_train, y_train)
-    y_pred = classifier.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    print(f"{dataset_name} Accuracy with {n_components} PCA components: {accuracy:.4f}")
-    return accuracy
-
-# for n_components in [50, 100, 200]:
-#     apply_pca(mnist_train_images_standardized, mnist_test_images_standardized, n_components, dataset_name="MNIST")
-#     apply_pca(fashion_train_images_standardized, fashion_test_images_standardized, n_components, dataset_name="Fashion MNIST")
-
 for n_components in [50, 100, 200]:
-    # MNIST
-    X_train_mnist_pca, X_test_mnist_pca, _ = apply_pca(
-        mnist_train_images_standardized, 
-        mnist_test_images_standardized, 
-        n_components, 
-        dataset_name="MNIST"
-    )
-    classify_and_predict(X_train_mnist_pca, mnist_train_images_label,
-                                  X_test_mnist_pca, mnist_test_images_label,
-                                  dataset_name="MNIST", n_components=n_components)
-    
-    # Fashion MNIST
-    X_train_fashion_pca, X_test_fashion_pca, _ = apply_pca(
-        fashion_train_images_standardized, 
-        fashion_test_images_standardized, 
-        n_components, 
-        dataset_name="Fashion MNIST"
-    )
-    classify_and_predict(X_train_fashion_pca, fashion_train_images_label,
-                                  X_test_fashion_pca, fashion_test_images_label,
-                                  dataset_name="Fashion MNIST", n_components=n_components)
-
+    apply_pca(mnist_train_images_standardized, mnist_test_images_standardized, n_components, dataset_name="MNIST")
+    apply_pca(fashion_train_images_standardized, fashion_test_images_standardized, n_components, dataset_name="Fashion MNIST")
 
 #_____________________________________________________________________________________________________________________ 
 # TASK 3.3 
@@ -200,15 +166,26 @@ def plot_confusion_matrix(y_true, y_pred, title):
     plt.title(title)
     plt.show()
 
-pca_100 = PCA(n_components=100) 
-mnist_pca_100_train = pca_100.fit_transform(mnist_train_images_standardized) 
-mnist_pca_100_test = pca_100.transform(mnist_test_images_standardized) 
+pca = PCA(n_components=100) 
+mnist_pca_train = pca.fit_transform(mnist_train_images_standardized) 
+mnist_pca_test = pca.transform(mnist_test_images_standardized) 
 
 #MNIST compressed data 
-X_train = mnist_pca_100_train 
-X_test = mnist_pca_100_test 
+X_train = mnist_pca_train 
+X_test = mnist_pca_test 
 y_train = mnist_train_images_label 
 y_test = mnist_test_images_label 
+
+# Fashion MNIST
+fashion_mnist_pca_train = pca.fit_transform(fashion_train_images_standardized) 
+fashion_mnist_pca_test = pca.transform(fashion_test_images_standardized) 
+
+#Fashion-MNIST compressed data 
+X_train1 = fashion_mnist_pca_train 
+X_test1 = fashion_mnist_pca_test 
+y_train1 = fashion_train_images_label
+y_test1 = fashion_test_images_label
+
 
 # Linear kernel 
 svc_linear, y_pred_linear = train_svc_with_grid_search(X_train, y_train, X_test, y_test, 'linear', param_grid_linear) 
@@ -221,3 +198,24 @@ plot_confusion_matrix(y_test, y_pred_rbf, "MNIST PCA(100) - RBF SVC")
 # Polynomial kernel 
 svc_poly, y_pred_poly = train_svc_with_grid_search(X_train, y_train, X_test, y_test, 'poly', param_grid_poly) 
 plot_confusion_matrix(y_test, y_pred_poly, "MNIST PCA(100) - Polynomial SVC")
+
+
+#-----------------------------------------------------------------------------------------------------------------------------
+# Fashion MNIST
+# Linear kernel 
+svc_linear1, y_pred_linear1 = train_svc_with_grid_search(X_train1, y_train1, X_test1, y_test1, 'linear', param_grid_linear) 
+plot_confusion_matrix(y_test1, y_pred_linear1, "Fashion-MNIST PCA(50) - Linear SVC")
+# plot_confusion_matrix(y_test1, y_pred_linear1, "Fashion-MNIST PCA(100) - Linear SVC")
+# plot_confusion_matrix(y_test1, y_pred_linear1, "Fashion-MNIST PCA(200) - Linear SVC")
+
+# RBF kernel 
+svc_rbf1, y_pred_rbf1 = train_svc_with_grid_search(X_train1, y_train1, X_test1, y_test1, 'rbf', param_grid_rbf) 
+plot_confusion_matrix(y_test1, y_pred_rbf1, "Fashion-MNIST PCA(50) - RBF SVC")
+# plot_confusion_matrix(y_test1, y_pred_rbf1, "Fashion-MNIST PCA(100) - RBF SVC")
+# plot_confusion_matrix(y_test1, y_pred_rbf1, "Fashion-MNIST PCA(200) - RBF SVC")
+
+# Polynomial kernel 
+svc_poly1, y_pred_poly1 = train_svc_with_grid_search(X_train1, y_train1, X_test1, y_test1, 'poly', param_grid_poly) 
+plot_confusion_matrix(y_test1, y_pred_poly1, "Fashion-MNIST PCA(50) - Polynomial SVC")
+# plot_confusion_matrix(y_test1, y_pred_poly1, "Fashion-MNIST PCA(100) - Polynomial SVC")
+# plot_confusion_matrix(y_test1, y_pred_poly1, "Fashion-MNIST PCA(200) - Polynomial SVC")
