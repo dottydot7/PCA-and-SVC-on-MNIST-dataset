@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 from matplotlib.colors import ListedColormap
 import matplotlib.pyplot as plt
 import matplotlib
-from distutils.version import LooseVersion
+#from distutils.version import LooseVersion
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.svm import LinearSVC as sklsvc
@@ -25,8 +25,6 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 
-
-
 # path = "\\"
 
 #MNIST
@@ -40,6 +38,10 @@ fashion_test_images = idx2numpy.convert_from_file("fashion_t10k-images-idx3-ubyt
 fashion_test_images_label = idx2numpy.convert_from_file("fashion_t10k-labels-idx1-ubyte")
 fashion_train_images = idx2numpy.convert_from_file("fashion_train-images-idx3-ubyte")
 fashion_train_images_label = idx2numpy.convert_from_file("fahion_train-labels-idx1-ubyte")
+
+fashion_test_images_label = idx2numpy.convert_from_file("\fashion_t10k-labels-idx1-ubyte")
+fashion_train_images = idx2numpy.convert_from_file("fashion_train-images-idx3-ubyte")
+fashion_train_images_label = idx2numpy.convert_from_file("fashion_train-labels-idx1-ubyte")
 
 
 # def plot_images(images, labels, title, n=10):
@@ -76,6 +78,7 @@ fashion_train_images_standardized = scalar.fit_transform(fashion_train_images_fl
 fashion_test_images_standardized = scalar.transform(fashion_test_images_flat)
 
 #PCA is sensitive to feature scales. Standardized data should be (mean=0, variance=1) but it's not. Ref: BOOK
+
 print("MNIST Train Mean:", np.mean(mnist_train_images_standardized)) 
 print("MNIST Train Std:", np.std(mnist_train_images_standardized))    
 print("Fashion MNIST Train Mean:", np.mean(fashion_train_images_standardized))  
@@ -85,6 +88,11 @@ print("MNIST Test Mean:", np.mean(mnist_test_images_standardized))
 print("MNIST Test Std:", np.std(mnist_test_images_standardized))    
 print("Fashion MNIST Test Mean:", np.mean(fashion_test_images_standardized))  
 print("Fashion MNIST Test Std:", np.std(fashion_test_images_standardized))    
+
+# print("MNIST Train Mean:", np.mean(mnist_train_images_standardized)) 
+# print("MNIST Train Std:", np.std(mnist_train_images_standardized))    
+# print("Fashion MNIST Train Mean:", np.mean(fashion_train_images_standardized))  
+# print("Fashion MNIST Train Std:", np.std(fashion_train_images_standardized))    
 
 
 #Dimensionality Reduction Functions
@@ -113,15 +121,18 @@ def apply_pca(X_train, X_test, n_components, dataset_name="Dataset"):
     X_train_pca = pca.fit_transform(X_train)
     X_test_pca = pca.transform(X_test)
     var_ratio = sum(pca.explained_variance_ratio_)
+
     print(f"{dataset_name} PCA (n_components={n_components}) Variance Explained: {var_ratio:.4f}")
+
+    print(f"\n{dataset_name} PCA (n_components={n_components}) Variance Explained: {var_ratio:.4f}")
+    
+
     plot_pca_variance(pca, dataset_name, n_components)
     return X_train_pca, X_test_pca, var_ratio
 
 for n_components in [50, 100, 200]:
     apply_pca(mnist_train_images_standardized, mnist_test_images_standardized, n_components, dataset_name="MNIST")
     apply_pca(fashion_train_images_standardized, fashion_test_images_standardized, n_components, dataset_name="Fashion MNIST")
-
-
 
 #_____________________________________________________________________________________________________________________ 
 # TASK 3.3 
@@ -178,9 +189,11 @@ def plot_confusion_matrix(y_true, y_pred, title):
     plt.show()
 
 
+
 pca = PCA(n_components=50) 
 # pca = PCA(n_components=100) 
 # pca = PCA(n_components=200) 
+
 mnist_pca_train = pca.fit_transform(mnist_train_images_standardized) 
 mnist_pca_test = pca.transform(mnist_test_images_standardized) 
 
@@ -218,7 +231,6 @@ plot_confusion_matrix(y_test, y_pred_poly, "MNIST PCA(50) - Polynomial SVC")
 # plot_confusion_matrix(y_test, y_pred_poly, "MNIST PCA(100) - Polynomial SVC")
 # plot_confusion_matrix(y_test, y_pred_poly, "MNIST PCA(200) - Polynomial SVC")
 
-
 #-----------------------------------------------------------------------------------------------------------------------------
 # Fashion MNIST
 # Linear kernel 
@@ -239,5 +251,3 @@ plot_confusion_matrix(y_test1, y_pred_poly1, "Fashion-MNIST PCA(50) - Polynomial
 # plot_confusion_matrix(y_test1, y_pred_poly1, "Fashion-MNIST PCA(100) - Polynomial SVC")
 # plot_confusion_matrix(y_test1, y_pred_poly1, "Fashion-MNIST PCA(200) - Polynomial SVC")
 
-
- 
